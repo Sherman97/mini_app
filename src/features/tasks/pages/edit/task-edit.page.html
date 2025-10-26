@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar><ion-title>{{ id ? 'Editar tarea' : 'Nueva tarea' }}</ion-title></ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-input [formControl]="title" label="Título" labelPlacement="stacked" placeholder="Ej. Comprar frutas"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-select label="Categoría" labelPlacement="stacked" [formControl]="categoryId" interface="popover" placeholder="Sin categoría">
+      <ion-select-option [value]="null">Sin categoría</ion-select-option>
+      <ion-select-option *ngFor="let c of categories.categories()" [value]="c.id">
+        {{ c.name }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-button expand="block" [disabled]="title.invalid" (click)="save()">
+    {{ id ? 'Actualizar' : 'Guardar' }}
+  </ion-button>
+</ion-content>

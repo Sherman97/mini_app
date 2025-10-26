@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Tareas ({{ store.pendingCount() }} pendientes)</ion-title>
+    <ion-buttons slot="end">
+      <ion-button [routerLink]="['/settings']">Settings</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Filtro por categoría -->
+  <ion-toolbar>
+    <ion-item lines="none">
+      <ion-label>Categoría</ion-label>
+      <ion-select
+        interface="popover"
+        [value]="selectedCategoryId()"
+        (ionChange)="selectedCategoryId.set($event.detail.value)"
+      >
+        <ion-select-option value="all">Todas</ion-select-option>
+        <ion-select-option *ngFor="let c of categories.categories()" [value]="c.id">
+          {{ c.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item-sliding *ngFor="let t of filteredTasks(); trackBy: trackById">
+      <ion-item>
+        <ion-checkbox slot="start" [checked]="t.done" (ionChange)="store.toggle(t.id)"></ion-checkbox>
+        <ion-label>
+          {{ t.title }}
+          <div class="text-xs" *ngIf="t.categoryId">
+            {{ categories.getById(t.categoryId!)?.name || 'Sin categoría' }}
+          </div>
+        </ion-label>
+      </ion-item>
+      <ion-item-options side="end">
+        <ion-item-option color="primary" [routerLink]="['/tasks/edit', t.id]">
+          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="danger" (click)="deleteTask(t.id)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button [routerLink]="['/tasks/new']">
+      <ion-icon name="add-circle"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

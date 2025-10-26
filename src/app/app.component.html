@@ -1,3 +1,10 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
+  <ion-tabs>
+    <ion-tab-bar slot="bottom">
+      <ion-tab-button tab="tasks" [routerLink]="['/tasks']">Tareas</ion-tab-button>
+      <ion-tab-button tab="categories" [routerLink]="['/categories']">Categorías</ion-tab-button>
+      <ion-tab-button tab="settings" [routerLink]="['/settings']">Ajustes</ion-tab-button>
+    </ion-tab-bar>
+  </ion-tabs>
 </ion-app>
