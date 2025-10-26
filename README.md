@@ -48,14 +48,19 @@ git clone https://github.com/Sherman97/mini_app.git
 2️⃣ Instalar dependencias
 npm install
 
+
 📲 Ejecución en entornos
+
 🧪 Web
-ionic serve
+|-------------|
+| ionic serve |
+
 
 🤖 Android
-ionic build
-npx cap sync android
-npx cap open android
+|-------------|
+| ionic build |
+| npx cap sync android |
+| npx cap open android |
 
 🍏 iOS
 ionic build
