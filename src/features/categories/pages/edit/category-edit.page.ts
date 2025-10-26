@@ -18,24 +18,46 @@ export class CategoryEditPage implements OnInit {
   private router = inject(Router);
 
   id: string | null = null;
-  name = new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] });
+  name = new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required, Validators.minLength(2)]
+  });
 
   async ngOnInit() {
     await this.store.load();
     this.id = this.route.snapshot.paramMap.get('id');
+
     if (this.id) {
       const c = this.store.getById(this.id);
-      if (c) this.name.setValue(c.name);
+      if (c) {
+        this.name.setValue(c.name ?? '');
+      } else {
+        this.router.navigate(['/categories']);
+      }
     }
   }
 
-  async save(){
-    const name = this.name.value.trim();
+  async save() {
+    if (this.name.invalid) {
+      this.name.markAsTouched();
+      return;
+    }
+
+    const name = (this.name.value ?? '').trim();
+    if (!name) {
+      this.name.setErrors({ required: true });
+      return;
+    }
+
     if (this.id) {
       await this.store.update({ id: this.id, name });
     } else {
-      await this.store.add({ id: crypto.randomUUID(), name });
+      const newId =
+        (globalThis as any)?.crypto?.randomUUID?.() ??
+        Math.random().toString(36).slice(2);
+      await this.store.add({ id: newId, name });
     }
+
     this.router.navigate(['/categories']);
   }
 }

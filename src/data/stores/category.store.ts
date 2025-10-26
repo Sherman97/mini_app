@@ -5,25 +5,22 @@ import { CategoryRepository } from '../repositories/category.repository';
 @Injectable({ providedIn: 'root' })
 export class CategoryStore {
   readonly categories = signal<Category[]>([]);
+  private unsubscribe?: () => void;
 
   constructor(private repo: CategoryRepository) {}
 
-  async load() { this.categories.set(await this.repo.all()); }
-
-  async add(c: Category) {
-    const list = [...this.categories(), c];
-    this.categories.set(list); await this.repo.saveAll(list);
+  async load() {
+    if (this.unsubscribe) return;
+    this.unsubscribe = this.repo.watch(rows => this.categories.set(rows));
   }
+
+  async add(c: Category) { await this.repo.add(c); }
 
   async update(patch: { id: string; name?: string; color?: string }) {
-    const list = this.categories().map(x => x.id === patch.id ? ({ ...x, ...patch }) : x);
-    this.categories.set(list); await this.repo.saveAll(list);
+    await this.repo.update(patch);
   }
 
-  async remove(id: string) {
-    const list = this.categories().filter(x => x.id !== id);
-    this.categories.set(list); await this.repo.saveAll(list);
-  }
+  async remove(id: string) { await this.repo.remove(id); }
 
   getById(id: string) { return this.categories().find(c => c.id === id); }
 }

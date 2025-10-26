@@ -7,38 +7,36 @@ export class TaskStore {
   readonly tasks = signal<Task[]>([]);
   readonly pendingCount = computed(() => this.tasks().filter(t => !t.done).length);
 
+  private unsubscribe?: () => void;
+
   constructor(private repo: TaskRepository) {}
 
-  async load() { this.tasks.set(await this.repo.all()); }
-
-  async add(task: Task) {
-    const list = [...this.tasks(), task];
-    this.tasks.set(list); await this.repo.saveAll(list);
+  async load() {
+    if (this.unsubscribe) return; // ya suscrito
+    this.unsubscribe = this.repo.watch(rows => this.tasks.set(rows));
   }
 
+  async add(task: Task) { await this.repo.add(task); }
+
   async update(patch: { id: string; title?: string; done?: boolean; categoryId?: string | null }) {
-    const list = this.tasks().map(t => t.id === patch.id ? ({ ...t, ...patch, updatedAt: Date.now() }) : t);
-    this.tasks.set(list); await this.repo.saveAll(list);
+    await this.repo.update(patch);
   }
 
   async toggle(id: string) {
-    const list = this.tasks().map(t => t.id === id ? ({...t, done: !t.done, updatedAt: Date.now()}) : t);
-    this.tasks.set(list); await this.repo.saveAll(list);
+    const t = this.getById(id);
+    if (!t) return;
+    await this.repo.update({ id, done: !t.done });
   }
 
-  async remove(id: string) {
-    const list = this.tasks().filter(t => t.id !== id);
-    this.tasks.set(list); await this.repo.saveAll(list);
-  }
+  async remove(id: string) { await this.repo.remove(id); }
 
   getById(id: string) { return this.tasks().find(t => t.id === id); }
 
   async assignCategory(taskId: string, categoryId: string | null) {
-    await this.update({ id: taskId, categoryId });
+    await this.repo.update({ id: taskId, categoryId });
   }
 
   async unassignByCategory(categoryId: string) {
-    const list = this.tasks().map(t => t.categoryId === categoryId ? ({ ...t, categoryId: null, updatedAt: Date.now() }) : t);
-    this.tasks.set(list); await this.repo.saveAll(list);
+    await this.repo.unassignByCategory(categoryId);
   }
 }
