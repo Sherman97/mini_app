@@ -38,6 +38,16 @@ La aplicación permite:
 
 ## 📂 Estructura general del proyecto
 
+ionic-todo/
+├── scapacitor.config.tss/
+│   │   ├── tasks/
+│   │   ├── categories/
+│   ├── data/
+│   └── app/
+├── android/
+├── ios/
+└── capacitor.config.ts
+
 
 
 ⚙️ Configuración inicial
@@ -63,9 +73,10 @@ npm install
 | npx cap open android |
 
 🍏 iOS
-ionic build
-npx cap sync ios
-npx cap open ios
+|-------------|
+| ionic build | 
+| npx cap sync ios | 
+| npx cap open ios | 
 
 
 👨‍💻 Autor
